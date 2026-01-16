@@ -1,5 +1,5 @@
 import logging
-from lib.api.server import app
+from app.server import app
 
 # Configure logging
 logging.basicConfig(

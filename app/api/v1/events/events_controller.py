@@ -1,9 +1,9 @@
 import logging
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
-from lib.api.v1.events.events_service import EventsService
-from lib.api.v1.events.events_model import Event
-from lib.api.v1.events.dependencies import get_service
+from app.api.v1.events.events_service import EventsService
+from app.api.v1.events.events_model import Event
+from app.api.v1.events.dependencies import get_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

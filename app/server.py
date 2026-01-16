@@ -3,8 +3,8 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from lib.api.v1.events import events_controller
-from lib.api.database import init_db
+from app.api.v1.events import events_controller
+from app.database import init_db
 
 logger = logging.getLogger("server")
 logger.setLevel(logging.DEBUG)

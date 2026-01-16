@@ -11,7 +11,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 def init_db():
     # Import models here to avoid circular imports
     # This ensures models are registered with SQLModel.metadata
-    from lib.api.v1.events.events_repository import EventSQLModel
+    from app.api.v1.events.events_repository import EventSQLModel
     SQLModel.metadata.create_all(engine)
 
 

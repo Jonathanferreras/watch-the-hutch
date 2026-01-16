@@ -1,6 +1,6 @@
 from typing import List
-from lib.api.v1.events.events_model import Event
-from lib.api.v1.events.events_repository import EventsRepository
+from app.api.v1.events.events_model import Event
+from app.api.v1.events.events_repository import EventsRepository
 
 class EventsService:
     def __init__(self, repository: EventsRepository = None):

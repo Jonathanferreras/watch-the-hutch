@@ -1,7 +1,7 @@
 """Dependency injection for events module."""
 from fastapi import Depends
-from lib.api.v1.events.events_repository import EventsRepository
-from lib.api.v1.events.events_service import EventsService
+from app.api.v1.events.events_repository import EventsRepository
+from app.api.v1.events.events_service import EventsService
 
 
 def get_repository() -> EventsRepository:
