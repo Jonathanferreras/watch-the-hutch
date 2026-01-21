@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.api.v1.events import events_controller
+from app.api.v1.state import state_controller
 from app.database import init_db
 
 logger = logging.getLogger("server")
@@ -19,6 +20,7 @@ def on_startup():
     logger.info("Database initialized successfully")
 
 app.include_router(events_controller.router, prefix=v1_prefix)
+app.include_router(state_controller.router, prefix=v1_prefix)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=FileResponse)

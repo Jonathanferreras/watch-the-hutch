@@ -10,7 +10,7 @@ class EventSQLModel(SQLModel, table=True):
     __tablename__ = "events"
     
     id: Optional[int] = Field(default=None, primary_key=True)
-    event_id: str = Field(index=True)
+    event_id: str = Field(unique=True, index=True)
     source_device_id: str = Field(index=True)
     bridge_state: BridgeState = Field(index=True)
     bridge_confidence: float = Field(index=True)
