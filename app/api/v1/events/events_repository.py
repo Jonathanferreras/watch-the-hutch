@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Session, select
 from sqlalchemy.engine import Engine
 from app.api.v1.events.events_model import Event, BridgeState
-from app.database import get_engine
+from app.db import get_engine
 
 
 class EventSQLModel(SQLModel, table=True):

@@ -1,12 +1,13 @@
 console.log("Hello World!");
 
 let state = {};
+const state_endpoint = "/api/v1/state";
 
 function fetch_current_State() {
-  fetch("/api/v1/state")
+  fetch(state_endpoint)
     .then((response) => response.json())
     .then((data) => {
-      state = { ...data }
+      state = { ...data };
       update_state();
     })
     .catch((error) => {
@@ -16,7 +17,9 @@ function fetch_current_State() {
 
 function update_state() {
   document.getElementById("bridge-status").textContent = state.bridge_state;
-  document.getElementById("timestamp").textContent = convert_timestamp(state.timestamp);
+  document.getElementById("timestamp").textContent = convert_timestamp(
+    state.timestamp,
+  );
 }
 
 function convert_timestamp(timestamp) {
@@ -29,7 +32,7 @@ function convert_timestamp(timestamp) {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false
+    hour12: false,
   });
 
   return estTime;

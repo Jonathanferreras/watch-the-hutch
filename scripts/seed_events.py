@@ -1,19 +1,32 @@
 #!/usr/bin/env python3
 """Script to seed the database with dummy event data."""
 
+import os
+import sys
+
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 import uuid
 from datetime import datetime, timedelta
 import random
 from app.api.v1.events.events_model import Event, BridgeState
 from app.api.v1.events.events_repository import EventsRepository
 from app.api.v1.state.state_service import StateService
-from app.database import get_engine
+from app.db import get_engine
 from sqlmodel import SQLModel
 
 def seed_events():
     """Create and insert 10 dummy events into the database."""
     
     # Initialize the database (create tables if they don't exist)
+    # Import all models to register them with SQLModel.metadata
+    from app.api.v1.events.events_repository import EventSQLModel
+    from app.api.v1.state.state_repository import StateSQLModel
+    from app.api.v1.admin.admin_repository import AdminUserSQLModel
+    
     engine = get_engine()
     SQLModel.metadata.create_all(engine)
     

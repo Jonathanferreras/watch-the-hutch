@@ -13,11 +13,11 @@ def init_db():
     # This ensures models are registered with SQLModel.metadata
     from app.api.v1.events.events_repository import EventSQLModel
     from app.api.v1.state.state_repository import StateSQLModel
+    from app.api.v1.admin.admin_repository import AdminUserSQLModel
     
-    # Drop all tables and recreate them to ensure schema matches models
+    # Create all tables if they don't exist
     # This is safe for development; for production, use proper migrations
-    # SQLModel.metadata.drop_all(engine)
-    # SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(engine)
 
 
 def get_engine():

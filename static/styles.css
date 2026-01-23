@@ -1,3 +1,122 @@
 body {
   font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+}
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.admin-container {
+  display: none;
+}
+.admin-container.active {
+  display: block;
+}
+h1 {
+  color: #333;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #0056b3;
+}
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.error-message {
+  color: #d32f2f;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  display: none;
+}
+.error-message.show {
+  display: block;
+}
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #eee;
+}
+.admin-info {
+  color: #666;
+}
+.logout-btn {
+  width: auto;
+  padding: 8px 16px;
+  background-color: #dc3545;
+  font-size: 14px;
+}
+.logout-btn:hover {
+  background-color: #c82333;
+}
+.admin-content {
+  margin-top: 20px;
+}
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.role-viewer {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+.role-editor {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+.role-admin {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+.section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+.section h2 {
+  margin-top: 0;
+  color: #333;
 }

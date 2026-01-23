@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey, Column, String
 from sqlalchemy.engine import Engine
 from app.api.v1.state.state_model import State
 from app.api.v1.events.events_model import BridgeState
-from app.database import get_engine
+from app.db import get_engine
 
 
 class StateSQLModel(SQLModel, table=True):

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <title>Admin - Watch The Hutch</title>
+  </head>
+  <body>
+    <!-- Login Form -->
+    <div id="login-container" class="login-container">
+      <h1>Admin Login</h1>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            autocomplete="username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+        <button type="submit" id="login-btn">Login</button>
+        <div id="login-error" class="error-message"></div>
+      </form>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-container" class="admin-container">
+      <div class="admin-header">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <div class="admin-info">
+            Logged in as: <strong id="admin-username"></strong>
+            <span id="admin-role-badge" class="role-badge"></span>
+          </div>
+        </div>
+        <button id="logout-btn" class="logout-btn">Logout</button>
+      </div>
+
+      <div class="admin-content">
+        <div class="section">
+          <h2>Welcome</h2>
+          <p>You are logged in to the Watch The Hutch admin panel.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="/static/js/admin.js"></script>
+</html>
