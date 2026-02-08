@@ -1,30 +1,35 @@
 console.log("Hello World!");
 
+const API = {
+  state: "/api/v1/state",
+};
+
+const dom = {
+  bridgeStatus: () => document.getElementById("bridge-status"),
+  timestamp: () => document.getElementById("timestamp"),
+};
+
 let state = {};
-const state_endpoint = "/api/v1/state";
 
-function fetch_current_State() {
-  fetch(state_endpoint)
-    .then((response) => response.json())
-    .then((data) => {
-      state = { ...data };
-      update_state();
-    })
-    .catch((error) => {
-      console.error("Error fetching bridge status:", error);
-    });
+async function fetchCurrentState() {
+  try {
+    const response = await fetch(API.state);
+    const data = await response.json();
+    state = { ...data };
+    updateState();
+  } catch (error) {
+    console.error("Error fetching bridge status:", error);
+  }
 }
 
-function update_state() {
-  document.getElementById("bridge-status").textContent = state.bridge_state;
-  document.getElementById("timestamp").textContent = convert_timestamp(
-    state.timestamp,
-  );
+function updateState() {
+  dom.bridgeStatus().textContent = state.bridge_state;
+  dom.timestamp().textContent = formatTimestamp(state.timestamp);
 }
 
-function convert_timestamp(timestamp) {
+function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
-  const estTime = date.toLocaleString("en-US", {
+  return date.toLocaleString("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
     month: "2-digit",
@@ -34,11 +39,11 @@ function convert_timestamp(timestamp) {
     second: "2-digit",
     hour12: false,
   });
-
-  return estTime;
 }
 
-window.onload = function () {
-  setInterval(fetch_current_State, 10000);
-  fetch_current_State();
-};
+function init() {
+  setInterval(fetchCurrentState, 10000);
+  fetchCurrentState();
+}
+
+window.addEventListener("load", init);

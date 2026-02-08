@@ -10,7 +10,7 @@
     <!-- Login Form -->
     <div id="login-container" class="login-container">
       <h1>Admin Login</h1>
-      <form id="login-form">
+      <form id="login-form" method="post">
         <div class="form-group">
           <label for="username">Username</label>
           <input
@@ -53,6 +53,19 @@
         <div class="section">
           <h2>Welcome</h2>
           <p>You are logged in to the Watch The Hutch admin panel.</p>
+        </div>
+      </div>
+      <div class="admin-content">
+        <div class="section">
+          <h2>Camera Feed</h2>
+          <video
+            id="v"
+            autoplay
+            playsinline
+            muted
+            style="width: 100%; background: black"
+            data-webrtc-url=""
+          ></video>
         </div>
       </div>
     </div>

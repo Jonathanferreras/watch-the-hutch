@@ -1,14 +1,28 @@
-// Admin page JavaScript
+const API = {
+  login: "/api/v1/admin/login",
+  logout: "/api/v1/admin/logout",
+  currentUser: "/api/v1/admin/me",
+};
 
 let currentAdmin = null;
-const login_endpoint = "/api/v1/admin/login";
-const logout_endpoint = "/api/v1/admin/logout";
-const current_user_endpoint = "/api/v1/admin/me";
 
-// Check authentication status on page load
+const dom = {
+  loginContainer: () => document.getElementById("login-container"),
+  adminContainer: () => document.getElementById("admin-container"),
+  adminUsername: () => document.getElementById("admin-username"),
+  adminRoleBadge: () => document.getElementById("admin-role-badge"),
+  loginForm: () => document.getElementById("login-form"),
+  loginError: () => document.getElementById("login-error"),
+  loginBtn: () => document.getElementById("login-btn"),
+  logoutBtn: () => document.getElementById("logout-btn"),
+  username: () => document.getElementById("username"),
+  password: () => document.getElementById("password"),
+  video: () => document.getElementById("v"),
+};
+
 async function checkAuth() {
   try {
-    const response = await fetch(current_user_endpoint);
+    const response = await fetch(API.currentUser);
     if (response.ok) {
       const admin = await response.json();
       currentAdmin = admin;
@@ -22,68 +36,39 @@ async function checkAuth() {
   }
 }
 
-// Show login form
 function showLoginForm() {
-  document.getElementById("login-container").style.display = "block";
-  document.getElementById("admin-container").classList.remove("active");
+  dom.loginContainer().style.display = "block";
+  dom.adminContainer().classList.remove("active");
   currentAdmin = null;
 }
 
-// Show admin dashboard
 function showAdminDashboard(admin) {
-  document.getElementById("login-container").style.display = "none";
-  document.getElementById("admin-container").classList.add("active");
+  dom.loginContainer().style.display = "none";
+  dom.adminContainer().classList.add("active");
+  dom.adminUsername().textContent = admin.username;
 
-  // Update admin info
-  document.getElementById("admin-username").textContent = admin.username;
+  const roleBadge = dom.adminRoleBadge();
 
-  // Update role badge
-  const roleBadge = document.getElementById("admin-role-badge");
   roleBadge.textContent = admin.role;
   roleBadge.className = `role-badge role-${admin.role.toLowerCase()}`;
-
-  // Show/hide sections based on role
-  const viewerSection = document.getElementById("viewer-section");
-  const editorSection = document.getElementById("editor-section");
-  const adminSection = document.getElementById("admin-section");
-
-  // Viewer can always see viewer section
-  viewerSection.style.display = "block";
-
-  // Editor and Admin can see editor section
-  if (admin.role === "EDITOR" || admin.role === "ADMIN") {
-    editorSection.style.display = "block";
-  } else {
-    editorSection.style.display = "none";
-  }
-
-  // Only Admin can see admin section
-  if (admin.role === "ADMIN") {
-    adminSection.style.display = "block";
-  } else {
-    adminSection.style.display = "none";
-  }
 }
 
-// Handle login form submission
 async function handleLogin(event) {
   event.preventDefault();
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  const loginBtn = document.getElementById("login-btn");
-  const errorDiv = document.getElementById("login-error");
+  const username = dom.username().value;
+  const password = dom.password().value;
+  const loginBtn = dom.loginBtn();
+  const errorDiv = dom.loginError();
 
-  // Clear previous errors
   errorDiv.classList.remove("show");
   errorDiv.textContent = "";
 
-  // Disable button during request
   loginBtn.disabled = true;
   loginBtn.textContent = "Logging in...";
 
   try {
-    const response = await fetch(login_endpoint, {
+    const response = await fetch(API.login, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,8 +83,7 @@ async function handleLogin(event) {
       const data = await response.json();
       currentAdmin = data.admin;
       showAdminDashboard(data.admin);
-      // Clear form
-      document.getElementById("login-form").reset();
+      dom.loginForm().reset();
     } else {
       const error = await response.json();
       errorDiv.textContent = error.detail || "Invalid username or password";
@@ -117,7 +101,7 @@ async function handleLogin(event) {
 
 async function handleLogout() {
   try {
-    const response = await fetch(logout_endpoint, {
+    const response = await fetch(API.logout, {
       method: "POST",
     });
 
@@ -134,9 +118,87 @@ async function handleLogout() {
   }
 }
 
-window.onload = function () {
-  document.getElementById("login-form").addEventListener("submit", handleLogin);
-  document.getElementById("logout-btn").addEventListener("click", handleLogout);
-
+function initAuthUI() {
+  dom.loginForm().addEventListener("submit", handleLogin);
+  dom.logoutBtn().addEventListener("click", handleLogout);
   checkAuth();
-};
+}
+
+function resolveWebRtcUrl(videoEl) {
+  return videoEl.dataset.webrtcUrl || "/camera/whep";
+}
+
+function createPeerConnection() {
+  return new RTCPeerConnection({ iceServers: [] });
+}
+
+function createInboundStream(videoEl, pc) {
+  const inbound = new MediaStream();
+  videoEl.srcObject = inbound;
+  pc.addTransceiver("video", { direction: "recvonly" });
+
+  pc.ontrack = async (ev) => {
+    inbound.addTrack(ev.track);
+    try {
+      await videoEl.play();
+    } catch (e) {
+      console.warn("play blocked:", e);
+    }
+  };
+
+  pc.oniceconnectionstatechange = () => {
+    console.log("ICE connection state:", pc.iceConnectionState);
+  };
+  pc.onconnectionstatechange = () => {
+    console.log("Peer connection state:", pc.connectionState);
+  };
+
+  return inbound;
+}
+
+async function waitForIceGatheringComplete(pc) {
+  if (pc.iceGatheringState === "complete") return;
+  await new Promise((resolve) => {
+    const checkState = () => {
+      if (pc.iceGatheringState === "complete") {
+        pc.removeEventListener("icegatheringstatechange", checkState);
+        resolve();
+      }
+    };
+    pc.addEventListener("icegatheringstatechange", checkState);
+  });
+}
+
+async function startWebRtc() {
+  const videoEl = dom.video();
+  if (!videoEl) return;
+
+  const webrtcUrl = resolveWebRtcUrl(videoEl);
+  const pc = createPeerConnection();
+
+  createInboundStream(videoEl, pc);
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  await waitForIceGatheringComplete(pc);
+
+  const res = await fetch(webrtcUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/sdp" },
+    body: pc.localDescription.sdp,
+  });
+
+  if (!res.ok) {
+    throw new Error(`WebRTC signaling failed: ${res.status} ${res.statusText}`);
+  }
+
+  const answerSdp = await res.text();
+  await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
+}
+
+function init() {
+  initAuthUI();
+  startWebRtc().catch(console.error);
+}
+
+document.addEventListener("DOMContentLoaded", init);

@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 from app.api.v1.events import events_controller
 from app.api.v1.state import state_controller
 from app.api.v1.admin import admin_controller
+from app.api.v1.webrtc import webrtc_controller
 from app.db import init_db
 
 logger = logging.getLogger("server")
@@ -23,6 +24,7 @@ def on_startup():
 app.include_router(events_controller.router, prefix=v1_prefix)
 app.include_router(state_controller.router, prefix=v1_prefix)
 app.include_router(admin_controller.router, prefix=f"{v1_prefix}/admin")
+app.include_router(webrtc_controller.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=FileResponse)

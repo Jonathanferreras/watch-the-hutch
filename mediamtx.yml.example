@@ -1,0 +1,12 @@
+logLevel: info
+
+rtsp: yes
+rtspAddress: [value]
+
+webrtc: yes
+webrtcAddress: [value]
+webrtcLocalUDPAddress: [value]
+
+paths:
+  camera:
+    source: publisher

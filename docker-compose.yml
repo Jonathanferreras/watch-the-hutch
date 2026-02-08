@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   db:
     image: postgres:15-alpine
@@ -9,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -17,12 +16,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
   app:
     build: .
     container_name: watch-the-hutch-app
     ports:
-      - "8000:8000"
+      - "${APP_PORT}:${APP_PORT}"
     volumes:
       - .:/app
     environment:
@@ -38,9 +36,22 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+
+      MEDIAMTX_WEBRTC_URL: ${MEDIAMTX_WEBRTC_URL}
     depends_on:
       db:
         condition: service_healthy
+  mediamtx:
+    image: bluenviron/mediamtx:1.16.1
+    container_name: watch-the-hutch-mediamtx
+    restart: unless-stopped
+    command: ["/mediamtx.yml"]
+    ports:
+      - "${MEDIAMTX_RTSP_PORT}:${MEDIAMTX_RTSP_PORT}"
+      - "${MEDIAMTX_WEBRTC_PORT}:${MEDIAMTX_WEBRTC_PORT}"
+      - "${MEDIAMTX_WEBRTC_UDP_PORT}:${MEDIAMTX_WEBRTC_UDP_PORT}/udp"
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
 
 volumes:
   postgres_data:
