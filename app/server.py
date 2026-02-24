@@ -3,6 +3,8 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from contextlib import asynccontextmanager
+
 from app.api.v1.events import events_controller
 from app.api.v1.state import state_controller
 from app.api.v1.admin import admin_controller
@@ -13,16 +15,17 @@ logger = logging.getLogger("server")
 logger.setLevel(logging.DEBUG)
 
 v1_prefix = "/api/v1"
-app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLIENT_DIR = os.path.join(BASE_DIR, "client")
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     logger.info("Initializing database...")
     init_db()
+    yield
     logger.info("Database initialized successfully")
 
+app = FastAPI(lifespan=lifespan)
 app.include_router(events_controller.router, prefix=v1_prefix)
 app.include_router(state_controller.router, prefix=v1_prefix)
 app.include_router(admin_controller.router, prefix=f"{v1_prefix}/admin")
