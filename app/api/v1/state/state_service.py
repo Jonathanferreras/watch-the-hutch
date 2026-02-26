@@ -1,8 +1,8 @@
 import uuid
 from typing import Optional
 from app.api.v1.state.state_model import State
-from app.api.v1.state.state_repository import StateRepository
 from app.api.v1.event.event_model import Event
+from app.api.v1.state.state_repository import StateRepository
 from app.api.v1.event.event_repository import EventRepository
 from app.api.v1.event.event_types import BridgeStatePayload, EventSourceType
 

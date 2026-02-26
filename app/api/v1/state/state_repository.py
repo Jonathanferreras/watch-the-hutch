@@ -1,7 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Session, select
-from sqlalchemy import ForeignKey, Column, String
+from sqlmodel import SQLModel, Field, Column, String, ForeignKey, Session, select
 from sqlalchemy.engine import Engine
 from app.api.v1.state.state_model import State
 from app.api.v1.event.event_types import BridgeStatus
@@ -39,7 +38,6 @@ class StateSQLModel(SQLModel, table=True):
             can_update=state.can_update
         )
 
-
 class StateRepository:
     def __init__(self, engine: Engine = None):
         self.engine = engine or get_engine()
@@ -73,7 +71,6 @@ class StateRepository:
             results = session.exec(statement).all()
             
             if results:
-                # Update existing state
                 existing_state = results[0]
                 existing_state.state_id = state.state_id
                 existing_state.bridge_state = state.bridge_state
@@ -86,7 +83,6 @@ class StateRepository:
 
                 return existing_state.to_domain()
             else:
-                # Create new state if none exists
                 state_sql_model = StateSQLModel.from_domain(state)
                 session.add(state_sql_model)
                 session.commit()

@@ -16,7 +16,6 @@ def get_current_state(service: StateService = Depends(get_service)) -> Optional[
         logger.error(f"Error getting current state: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error getting current state: {str(e)}")
 
-
 @router.post("/state")
 def create_state(state: State, service: StateService = Depends(get_service)) -> State:
     try:
