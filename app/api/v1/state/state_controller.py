@@ -24,3 +24,12 @@ def create_state(state: State, service: StateService = Depends(get_service)) -> 
     except Exception as e:
         logger.error(f"Error creating state: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error creating current state: {str(e)}")
+
+@router.post("/state/can_update")
+def can_update_state(value: bool, service: StateService = Depends(get_service)) -> State:
+    try:
+        return service.toggle_updates(value)
+            
+    except Exception as e:
+        logger.error(f"Error creating state: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error creating current state: {str(e)}")

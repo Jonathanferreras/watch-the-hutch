@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 
-from app.api.v1.events import events_controller
+from app.api.v1.event import event_controller
 from app.api.v1.state import state_controller
 from app.api.v1.admin import admin_controller
 from app.api.v1.webrtc import webrtc_controller
@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     logger.info("Database initialized successfully")
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(events_controller.router, prefix=v1_prefix)
+app.include_router(event_controller.router, prefix=v1_prefix)
 app.include_router(state_controller.router, prefix=v1_prefix)
 app.include_router(admin_controller.router, prefix=f"{v1_prefix}/admin")
 app.include_router(webrtc_controller.router)

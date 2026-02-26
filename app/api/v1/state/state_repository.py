@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Field, Session, select
 from sqlalchemy import ForeignKey, Column, String
 from sqlalchemy.engine import Engine
 from app.api.v1.state.state_model import State
-from app.api.v1.events.events_model import BridgeState
+from app.api.v1.event.event_types import BridgeStatus
 from app.db import get_engine
 
 
@@ -13,18 +13,20 @@ class StateSQLModel(SQLModel, table=True):
     
     id: Optional[int] = Field(default=None, primary_key=True)
     state_id: str = Field(index=True)
-    bridge_state: BridgeState = Field(index=True)
+    bridge_state: BridgeStatus = Field(index=True)
     timestamp: datetime = Field(index=True)
     last_event_id: str = Field(
-        sa_column=Column(String, ForeignKey("events.event_id"), index=True)
+        sa_column=Column(String, ForeignKey("event.event_id"), index=True)
     )
+    can_update: bool = Field(default=True, index=True)
     
     def to_domain(self) -> State:
         return State(
             state_id=self.state_id,
             bridge_state=self.bridge_state,
             timestamp=self.timestamp,
-            last_event_id=self.last_event_id
+            last_event_id=self.last_event_id,
+            can_update=True if self.can_update is None else self.can_update
         )
     
     @classmethod
@@ -33,7 +35,8 @@ class StateSQLModel(SQLModel, table=True):
             state_id=state.state_id,
             bridge_state=state.bridge_state,
             timestamp=state.timestamp,
-            last_event_id=state.last_event_id
+            last_event_id=state.last_event_id,
+            can_update=state.can_update
         )
 
 
@@ -76,6 +79,7 @@ class StateRepository:
                 existing_state.bridge_state = state.bridge_state
                 existing_state.timestamp = state.timestamp
                 existing_state.last_event_id = state.last_event_id
+                existing_state.can_update = state.can_update
                 session.add(existing_state)
                 session.commit()
                 session.refresh(existing_state)
