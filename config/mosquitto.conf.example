@@ -1,0 +1,8 @@
+listener [Port]
+allow_anonymous [Value]
+password_file [Path to file]
+
+persistence [Value]
+persistence_location [Path to file]
+
+log_dest [Value]

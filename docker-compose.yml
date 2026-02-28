@@ -16,6 +16,41 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: watch-the-hutch-mqtt
+    restart: unless-stopped
+    ports:
+      - "${MQTT_PORT}:${MQTT_PORT}"
+    environment:
+      MQTT_USERNAME: ${MQTT_USERNAME}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+    entrypoint: >
+      sh -c "
+        set -e;
+        if [ ! -f /mosquitto/data/passwords ]; then
+          mosquitto_passwd -b -c /mosquitto/data/passwords \"$MQTT_USERNAME\" \"$MQTT_PASSWORD\";
+        else
+          mosquitto_passwd -b /mosquitto/data/passwords \"$MQTT_USERNAME\" \"$MQTT_PASSWORD\";
+        fi;
+        chown -R mosquitto:mosquitto /mosquitto/data;
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
+      "
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'mosquitto_sub -h localhost -u "$$MQTT_USERNAME" -P "$$MQTT_PASSWORD" -t ''$$SYS/broker/version'' -C 1 -W 5 >/dev/null 2>&1 || exit 1',
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
   app:
     build: .
     container_name: watch-the-hutch-app
@@ -38,9 +73,17 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
 
       MEDIAMTX_WEBRTC_URL: ${MEDIAMTX_WEBRTC_URL}
+
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MQTT_USERNAME: ${MQTT_USERNAME}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
+      mqtt:
+        condition: service_healthy
+
   mediamtx:
     image: bluenviron/mediamtx:1.16.1
     container_name: watch-the-hutch-mediamtx
@@ -51,7 +94,9 @@ services:
       - "${MEDIAMTX_WEBRTC_PORT}:${MEDIAMTX_WEBRTC_PORT}"
       - "${MEDIAMTX_WEBRTC_UDP_PORT}:${MEDIAMTX_WEBRTC_UDP_PORT}/udp"
     volumes:
-      - ./mediamtx.yml:/mediamtx.yml:ro
+      - ./config/mediamtx.yml:/mediamtx.yml:ro
 
 volumes:
   postgres_data:
+  mosquitto_data:
+  mosquitto_log:

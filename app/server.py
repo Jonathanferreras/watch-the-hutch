@@ -9,6 +9,7 @@ from app.api.v1.event import event_controller
 from app.api.v1.state import state_controller
 from app.api.v1.admin import admin_controller
 from app.api.v1.webrtc import webrtc_controller
+from app.mqtt.handler import connect_mqtt
 from app.db import init_db
 
 logger = logging.getLogger("server")
@@ -22,8 +23,12 @@ CLIENT_DIR = os.path.join(BASE_DIR, "client")
 async def lifespan(app: FastAPI):
     logger.info("Initializing database...")
     init_db()
-    yield
     logger.info("Database initialized successfully")
+    logger.info("Connecting to MQTT broker...")
+    connect_mqtt()
+    yield
+    logger.info("Shutting down...")
+
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(event_controller.router, prefix=v1_prefix)

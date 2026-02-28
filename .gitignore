@@ -1,4 +1,5 @@
 .venv
 .env
 mediamtx.yml
+mosquitto.conf
 __pycache__
