@@ -89,6 +89,8 @@ services:
     container_name: watch-the-hutch-mediamtx
     restart: unless-stopped
     command: ["/mediamtx.yml"]
+    environment:
+      MTX_WEBRTCADDITIONALHOSTS: ${MEDIAMTX_WEBRTC_ADDITIONAL_HOSTS}
     ports:
       - "${MEDIAMTX_RTSP_PORT}:${MEDIAMTX_RTSP_PORT}"
       - "${MEDIAMTX_WEBRTC_PORT}:${MEDIAMTX_WEBRTC_PORT}"
