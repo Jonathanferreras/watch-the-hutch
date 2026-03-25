@@ -84,6 +84,34 @@ services:
       mqtt:
         condition: service_healthy
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: watch-the-hutch-frontend
+    command:
+      [
+        "npm",
+        "run",
+        "dev",
+        "--",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "${FRONTEND_CONTAINER_PORT}",
+      ]
+    ports:
+      - "${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "100"
+    depends_on:
+      - app
+
   mediamtx:
     image: bluenviron/mediamtx:1.16.1
     container_name: watch-the-hutch-mediamtx
