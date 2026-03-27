@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+
 import { fetchBridgeState } from "../api/bridge";
+import { formatTimestamp } from "../utils/time";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -32,7 +34,7 @@ function HomeComponent() {
       return (
         <ul>
           <li>{state.bridgeState}</li>
-          <li>{state.timestamp}</li>
+          <li>{formatTimestamp(state.timestamp)}</li>
         </ul>
       );
     } else {

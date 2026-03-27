@@ -37,10 +37,6 @@ app.include_router(admin_controller.router, prefix=f"{v1_prefix}/admin")
 app.include_router(webrtc_controller.router)
 app.mount("/static", StaticFiles(directory=CLIENT_DIR), name="static")
 
-@app.get("/", response_class=FileResponse)
-async def serve_home():
-    return FileResponse(os.path.join(CLIENT_DIR, "index.html"))
-
 @app.get("/admin", response_class=FileResponse)
 async def serve_admin():
     return FileResponse(os.path.join(CLIENT_DIR, "admin.html"))
