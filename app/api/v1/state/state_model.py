@@ -9,6 +9,7 @@ class State(BaseModel):
     bridge_state: BridgeStatus
     timestamp: datetime
     last_event_id: str
+    """ Useful when bridge state is updated by user instead of device, if so then we ignore updates from the device until specified otherwise."""
     can_update: bool = True
 
     class Config:

@@ -109,6 +109,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
       CHOKIDAR_INTERVAL: "100"
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
     depends_on:
       - app
 
