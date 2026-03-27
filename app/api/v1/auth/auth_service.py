@@ -12,7 +12,7 @@ class AuthService:
             "access_token": token
         }
 
-    def sign_jwt(self, user_id: str):
+    def sign_jwt(self, user_id: int):
         payload = {
             "user_id": user_id,
             "expires": time.time() + 600
@@ -26,13 +26,13 @@ class AuthService:
             decoded_token = jwt.decode(token, self.secret, algorithms=[self.algorithm])
 
             return decoded_token if decoded_token["expires"] >= time.time() else None
-        except:
-            return {}
+        except Exception:
+            return None
         
     def verify_jwt(self, token:str):
         try:
             payload = self.decode_jwt(token)
-        except:
+        except Exception:
             payload = None
 
         return True if payload else False
