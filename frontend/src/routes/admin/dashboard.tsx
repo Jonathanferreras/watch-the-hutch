@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { logoutUser, requireUser } from "../../api/auth";
+import { fetchCameraFeed } from "../../api/camera";
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: AdminDashboardComponent,
@@ -29,7 +30,6 @@ function AdminDashboardComponent() {
       return;
     }
 
-    const resolveWebRtcUrl = () => videoEl.dataset.webrtcUrl || "/camera/whep";
     const createPeerConnection = () =>
       new RTCPeerConnection({ iceServers: [] });
 
@@ -80,21 +80,7 @@ function AdminDashboardComponent() {
       await pc.setLocalDescription(offer);
       await waitForIceGatheringComplete(pc);
 
-      const response = await fetch(resolveWebRtcUrl(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/sdp",
-        },
-        body: pc.localDescription?.sdp,
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `WebRTC signaling failed: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const answerSdp = await response.text();
+      const answerSdp = await fetchCameraFeed(pc);
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
     };
 
