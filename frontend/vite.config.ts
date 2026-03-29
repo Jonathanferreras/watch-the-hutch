@@ -15,6 +15,10 @@ export default defineConfig(({ mode }) => {
           target: `${apiBaseUrl}`,
           changeOrigin: true,
         },
+        "/camera": {
+          target: `${apiBaseUrl}`,
+          changeOrigin: true,
+        },
       },
     },
     plugins: [
