@@ -7,7 +7,7 @@ class Event(BaseModel):
     source_id: str
     source_type: EventSourceType
     payload: BridgeStatePayload | DeviceTelemetryPayload
-    #payloadType: EventPayloadType <- TODO: update database to have this column
+    payloadType: EventPayloadType
     timestamp: datetime
 
     class Config:

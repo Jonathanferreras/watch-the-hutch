@@ -31,5 +31,5 @@ class DeviceTelemetryPayload(BaseModel):
     temperature: str
     voltage: str
     camera_connected: bool
-    camera_view_status: CameraViewStatus
+    camera_view_status: CameraViewStatus | None #TODO: Remove None once this feature is built.
     is_online: bool

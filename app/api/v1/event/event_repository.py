@@ -16,7 +16,7 @@ class EventSQLModel(SQLModel, table=True):
     source_id: str = Field(index=True)
     source_type: EventSourceType = Field(index=True)
     payload: Union[BridgeStatePayload, DeviceTelemetryPayload] = Field(sa_column=Column(JSON), default_factory=dict)
-    # payloadType: EventPayloadType = Field(index=True)
+    payloadType: EventPayloadType = Field(index=True)
     timestamp: datetime = Field(index=True)
 
     @staticmethod
@@ -39,7 +39,7 @@ class EventSQLModel(SQLModel, table=True):
             source_id=self.source_id,
             source_type=self.source_type,
             payload=self._deserialize_payload(self.payload),
-            # payloadType=self.payloadType,
+            payloadType=self.payloadType,
             timestamp=self.timestamp
         )
     
@@ -50,7 +50,7 @@ class EventSQLModel(SQLModel, table=True):
             source_id=event.source_id,
             source_type=event.source_type,
             payload=cls._serialize_payload(event.payload),
-            # payloadType=event.payloadType,
+            payloadType=event.payloadType,
             timestamp=event.timestamp
         )
 

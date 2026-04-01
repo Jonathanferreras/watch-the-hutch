@@ -35,9 +35,8 @@ def on_message(client, userdata, message):
 
         logger.info(f"Payload: {payload}")
 
-        # TODO: uncomment to work on processing data from edge device
-        # future = asyncio.run_coroutine_threadsafe(process_mqtt_message(topic, payload), loop)
-        # result = future.result()
+        future = asyncio.run_coroutine_threadsafe(process_mqtt_message(topic, payload), loop)
+        result = future.result()
 
     except Exception as e:
         logger.error(f"Error processing MQTT message: {e}")
