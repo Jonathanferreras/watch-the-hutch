@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from app.api.v1.event.event_service import EventService
 from app.api.v1.event.event_model import Event
+from app.api.v1.event.event_types import EventPayloadType
 from app.api.v1.event.dependencies import get_service
 
 logger = logging.getLogger(__name__)
@@ -24,3 +25,11 @@ def create_event(event: Event, service: EventService = Depends(get_service)) -> 
     except Exception as e:
         logger.error(f"Error creating event: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error creating event: {str(e)}")
+
+@router.get("/event/latest_by_type")
+def latest_event_by_type(event_type: EventPayloadType, service: EventService = Depends(get_service)) -> Event:
+    try:
+        return service.latest_event_by_type(event_type)
+    except Exception as e:
+        logger.error(f"Error getting latest event: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error getting latest event: {str(e)}")

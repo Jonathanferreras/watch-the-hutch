@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from app.api.v1.event.event_model import Event
-from app.api.v1.event.event_types import EventSourceType
+from app.api.v1.event.event_types import EventSourceType, EventPayloadType
 from app.api.v1.event.event_repository import EventRepository
 from app.api.v1.state.state_service import StateService
 
@@ -35,3 +35,6 @@ class EventService:
 
     def get_events(self) -> List[Event]:
         return self.repository.get_events()
+    
+    def latest_event_by_type(self, event_type: EventPayloadType) -> Event:
+        return self.repository.get_latest_event_by_type(event_type)

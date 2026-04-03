@@ -81,3 +81,9 @@ class EventRepository:
             statement = select(EventSQLModel).order_by(EventSQLModel.timestamp.desc()).limit(1)
             result = session.exec(statement).first()
             return result.to_domain() if result else None
+        
+    def get_latest_event_by_type(self, event_type: EventPayloadType) -> Optional[Event]:
+        with self._get_session() as session:
+            statement = select(EventSQLModel).order_by(EventSQLModel.timestamp.desc()).where(EventSQLModel.payloadType == event_type).limit(1)
+            result = session.exec(statement).first()
+            return result.to_domain() if result else None
