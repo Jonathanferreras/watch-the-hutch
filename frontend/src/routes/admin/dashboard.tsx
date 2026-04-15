@@ -31,12 +31,9 @@ function AdminDashboardComponent() {
           Logout
         </button>
       </div>
-      <div>
-        <h2>Camera Feed</h2>
-        <CameraFeed maxWidth="768px" />
-      </div>
-      <div>
-        <h2>Device Health</h2>
+      <div style={{ maxWidth: "768px" }}>
+        <CameraFeed />
+        <br />
         <DeviceHealth />
       </div>
     </div>
