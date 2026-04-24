@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CameraFeed } from "../../components/CameraFeed";
 import { DeviceHealth } from "../../components/DeviceHealth";
 import { logoutUser, requireUser } from "../../api/auth";
+import { StatusEditor } from "../../components/ StatusEditor";
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: AdminDashboardComponent,
@@ -35,6 +36,8 @@ function AdminDashboardComponent() {
         <CameraFeed />
         <br />
         <DeviceHealth />
+        <br />
+        <StatusEditor />
       </div>
     </div>
   );

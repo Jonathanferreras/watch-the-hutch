@@ -1,18 +1,28 @@
 import uuid
+import datetime
 from typing import Optional
-from app.api.v1.state.state_model import State
+from app.api.v1.state.state_model import State, StateUpdateRequest
 from app.api.v1.event.event_model import Event
 from app.api.v1.state.state_repository import StateRepository
 from app.api.v1.event.event_repository import EventRepository
-from app.api.v1.event.event_types import BridgeStatePayload, EventSourceType
+from app.api.v1.event.event_types import BridgeStatePayload, EventSourceType, EventPayloadType
 
 class StateService:
     def __init__(self, repository: StateRepository = None, event_repository: EventRepository = None):
         self.repository = repository or StateRepository()
         self.event_repository = event_repository or EventRepository()
 
-    def create_state(self, state: State) -> State:
-        return self.repository.create_state(state)
+    def create_state(self, state_update: StateUpdateRequest) -> State:
+        event = Event(
+            event_id=str(uuid.uuid4()),
+            source_id="admin",
+            source_type=EventSourceType.USER,
+            payload=BridgeStatePayload(status=state_update.bridge_state, confidence="manual"),
+            payloadType=EventPayloadType.BRIDGE_STATE,
+            timestamp=datetime.datetime.utcnow(),
+        )
+        created_event = self.event_repository.create_event(event)
+        return self.update_current_state(created_event, can_update=False)
 
     def get_current_state(self) -> Optional[State]:
         return self.repository.get_current_state()
@@ -30,12 +40,6 @@ class StateService:
             updated_state = self.repository.update_current_state(new_state)
         else:
             updated_state = None
-
-        if value:
-            latest_event = self.event_repository.get_latest_event()
-            
-            if latest_event:
-                return self.update_current_state(latest_event, can_update=True)
 
         return updated_state
 
@@ -66,4 +70,5 @@ class StateService:
             last_event_id=event.event_id,
             can_update=can_update
         )
+
         return self.repository.update_current_state(new_state)

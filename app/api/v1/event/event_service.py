@@ -16,12 +16,18 @@ class EventService:
         created_event = self.repository.create_event(event)
         
         try:
+            if created_event.payloadType != EventPayloadType.BRIDGE_STATE:
+                return created_event
+
             current_state = self.state_service.get_current_state()
 
-            if created_event.source_type == EventSourceType.DEVICE and current_state.can_update:
-                self.state_service.update_current_state(created_event)
-            elif created_event.source_type == EventSourceType.USER:
+            if created_event.source_type == EventSourceType.USER:
                 self.state_service.update_current_state(created_event, can_update=False)
+            elif (
+                created_event.source_type == EventSourceType.DEVICE
+                and (current_state is None or current_state.can_update)
+            ):
+                self.state_service.update_current_state(created_event)
 
         except Exception as e:
             logger.error(

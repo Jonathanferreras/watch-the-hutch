@@ -1,5 +1,3 @@
-import { formatTimestamp } from "../utils/time";
-
 const API = {
   getDeviceTelemetry:
     "/api/v1/event/latest_by_type?event_type=DEVICE_TELEMETRY",

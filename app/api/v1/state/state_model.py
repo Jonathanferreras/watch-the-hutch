@@ -14,3 +14,7 @@ class State(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class StateUpdateRequest(BaseModel):
+    bridge_state: BridgeStatus
