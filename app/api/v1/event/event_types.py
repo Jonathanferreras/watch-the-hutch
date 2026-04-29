@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 from pydantic import BaseModel
 
 class EventSourceType(str, Enum):
@@ -8,6 +9,7 @@ class EventSourceType(str, Enum):
 class EventPayloadType(str, Enum):
     BRIDGE_STATE = "BRIDGE_STATE"
     DEVICE_TELEMETRY = "DEVICE_TELEMETRY"
+    BOAT_DETECTION = "BOAT_DETECTION"
 
 class BridgeStatus(str, Enum):
     CLOSED = "CLOSED"
@@ -33,3 +35,14 @@ class DeviceTelemetryPayload(BaseModel):
     camera_connected: bool
     camera_view_status: CameraViewStatus | None #TODO: Remove None once this feature is built.
     is_online: bool
+
+
+class BoatDetectionPayload(BaseModel):
+    direction: str
+    detected_at: datetime
+    published_at: datetime
+    confidence: float
+    source: str
+    center_x: float
+    image_topic: str
+    image_id: str

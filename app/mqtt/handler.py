@@ -5,8 +5,8 @@ import logging
 import threading
 import signal
 from app.mqtt.client import mqtt_client
-from app.mqtt.topics import DEVICE_TELEMETRY, TEST
-from app.mqtt.events.event_manager import process_mqtt_message
+from app.mqtt.topics import BOAT_DETECTION, BOAT_DETECTION_IMAGE, DEVICE_TELEMETRY, TEST
+from app.mqtt.events.event_manager import process_mqtt_image, process_mqtt_message
 
 MQTT_BROKER = os.getenv("MQTT_BROKER", "")
 MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
@@ -19,24 +19,35 @@ def start_event_loop():
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
+def _log_async_result(future):
+    try:
+        future.result()
+    except Exception as e:
+        logger.error(f"Error processing MQTT message: {e}")
+
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code == 0:
         logger.info("Connected to MQTT Broker!")
         client.subscribe(DEVICE_TELEMETRY)
+        client.subscribe(BOAT_DETECTION)
+        client.subscribe(f"{BOAT_DETECTION_IMAGE}/+")
         client.subscribe(TEST)
     else:
         logger.error(f"Failed to connect to MQTT Broker! Reason: {reason_code}")
 
 def on_message(client, userdata, message):
     topic = message.topic
-    payload = message.payload.decode()
 
     try:
-
-        logger.info(f"Payload: {payload}")
-
-        future = asyncio.run_coroutine_threadsafe(process_mqtt_message(topic, payload), loop)
-        result = future.result()
+        if topic.startswith(f"{BOAT_DETECTION_IMAGE}/"):
+            logger.info("Received boat detection image on topic %s", topic)
+            future = asyncio.run_coroutine_threadsafe(process_mqtt_image(topic, message.payload), loop)
+            future.add_done_callback(_log_async_result)
+        else:
+            payload = message.payload.decode()
+            logger.info(f"Payload: {payload}")
+            future = asyncio.run_coroutine_threadsafe(process_mqtt_message(topic, payload), loop)
+            future.result()
 
     except Exception as e:
         logger.error(f"Error processing MQTT message: {e}")

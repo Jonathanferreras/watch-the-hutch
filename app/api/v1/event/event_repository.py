@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Field, Column, JSON, Session, select
 from sqlalchemy.engine import Engine
 from pydantic import BaseModel
 from app.api.v1.event.event_model import Event
-from app.api.v1.event.event_types import BridgeStatePayload, DeviceTelemetryPayload, EventSourceType, EventPayloadType
+from app.api.v1.event.event_types import BridgeStatePayload, DeviceTelemetryPayload, BoatDetectionPayload, EventSourceType, EventPayloadType
 from app.db import get_engine
 
 
@@ -15,21 +15,26 @@ class EventSQLModel(SQLModel, table=True):
     event_id: str = Field(unique=True, index=True)
     source_id: str = Field(index=True)
     source_type: EventSourceType = Field(index=True)
-    payload: Union[BridgeStatePayload, DeviceTelemetryPayload] = Field(sa_column=Column(JSON), default_factory=dict)
+    payload: Union[BridgeStatePayload, DeviceTelemetryPayload, BoatDetectionPayload] = Field(sa_column=Column(JSON), default_factory=dict)
     payloadType: EventPayloadType = Field(index=True)
     timestamp: datetime = Field(index=True)
 
     @staticmethod
-    def _serialize_payload(payload: Union[BridgeStatePayload, DeviceTelemetryPayload, dict]) -> dict:
+    def _serialize_payload(payload: Union[BridgeStatePayload, DeviceTelemetryPayload, BoatDetectionPayload, dict]) -> dict:
         if isinstance(payload, BaseModel):
-            return payload.model_dump()
+            return payload.model_dump(mode="json")
         return payload
 
     @staticmethod
-    def _deserialize_payload(payload: Union[dict, BridgeStatePayload, DeviceTelemetryPayload]) -> Union[BridgeStatePayload, DeviceTelemetryPayload]:
+    def _deserialize_payload(
+        payload: Union[dict, BridgeStatePayload, DeviceTelemetryPayload, BoatDetectionPayload],
+        payload_type: EventPayloadType,
+    ) -> Union[BridgeStatePayload, DeviceTelemetryPayload, BoatDetectionPayload]:
         if isinstance(payload, dict):
-            if "status" in payload:
+            if payload_type == EventPayloadType.BRIDGE_STATE:
                 return BridgeStatePayload(**payload)
+            if payload_type == EventPayloadType.BOAT_DETECTION:
+                return BoatDetectionPayload(**payload)
             return DeviceTelemetryPayload(**payload)
         return payload
     
@@ -38,7 +43,7 @@ class EventSQLModel(SQLModel, table=True):
             event_id=self.event_id,
             source_id=self.source_id,
             source_type=self.source_type,
-            payload=self._deserialize_payload(self.payload),
+            payload=self._deserialize_payload(self.payload, self.payloadType),
             payloadType=self.payloadType,
             timestamp=self.timestamp
         )
